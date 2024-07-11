@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255814710985",
+    "project_id": "journal-app-finals",
+    "storage_bucket": "journal-app-finals.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255814710985:android:1450c6b90511ed51b9bf18",
+        "android_client_info": {
+          "package_name": "com.example.flutter_journal_app_finals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyW-lS0FyDglWYNBlK3nNuWfT_9ZNbV3c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
