@@ -91,7 +91,7 @@ class _CreateJournalEntryScreenState extends State<CreateJournalEntryScreen> {
           'imageUrl': imageUrl ?? '', // Include image URL if available
         });
         print('Journal entry added successfully');
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true); // Pass true as a result
       } catch (e) {
         print('Error adding journal entry: $e');
       }

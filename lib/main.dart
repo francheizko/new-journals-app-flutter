@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Import the Provider package
+import 'package:state_change_demo/constants/journal_entries_notifier.dart';
 import 'package:state_change_demo/controller/auth_controller.dart';
 import 'package:state_change_demo/firebase_options.dart';
 import 'package:state_change_demo/routing/router.dart';
@@ -14,7 +16,12 @@ void main() async {
   GlobalRouter.initialize();
 
   await AuthController.I.loadSession();
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => JournalEntriesNotifier(), // Initialize the notifier
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:state_change_demo/constants/constants.dart';
 import 'package:state_change_demo/controller/auth_controller.dart';
 import 'package:state_change_demo/dialogs/waiting_dailog.dart';
 
@@ -12,9 +13,10 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: lwhite,
         bottomNavigationBar: SafeArea(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
+            margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
             height: 52,
             child: ElevatedButton(
               onPressed: () {

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:state_change_demo/constants/constants.dart';
 import 'package:state_change_demo/controller/auth_controller.dart';
 import 'package:state_change_demo/dialogs/waiting_dailog.dart';
 import 'package:state_change_demo/routing/router.dart';
@@ -46,33 +48,65 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[400],
+      backgroundColor: lwhite,
       appBar: AppBar(
+        backgroundColor: lwhite,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text("Register"),
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 180),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Flexible(
-                child: ElevatedButton(
-                  onPressed: () {
-                    GlobalRouter.I.router.go(LoginScreen.route);
-                  },
-                  child: const Text("Go back to login screen"),
-                ),
-              ),
-              Flexible(
+              SizedBox(
+                height: 50,
                 child: ElevatedButton(
                   onPressed: () {
                     onSubmit();
                   },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: lmainblue,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   child: const Text("Register"),
+                ),
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: () {
+                  GlobalRouter.I.router.go(LoginScreen.route);
+                },
+                child: RichText(
+                  text: TextSpan(
+                    text: "Go back to ",
+                    style: GoogleFonts.poppins(
+                      color: ldarkblue,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: "Login Screen",
+                        style: GoogleFonts.poppins(
+                          color: lmainblue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
@@ -85,8 +119,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           child: Form(
             key: formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text(
+                  'Sign Up',
+                  style: GoogleFonts.poppins(
+                    color: llightgray,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
                 Flexible(
                   child: TextFormField(
                     decoration: decoration.copyWith(
@@ -104,7 +150,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 8,
+                  height: 25,
                 ),
                 Flexible(
                   child: TextFormField(
@@ -126,8 +172,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     controller: password,
                     onEditingComplete: () {
                       passwordFn2.requestFocus();
-
-                      ///call submit maybe?
                     },
                     validator: MultiValidator([
                       RequiredValidator(errorText: "Password is required"),
@@ -144,7 +188,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 8,
+                  height: 25,
                 ),
                 Flexible(
                   child: TextFormField(
@@ -166,8 +210,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       controller: password2,
                       onEditingComplete: () {
                         passwordFn2.unfocus();
-
-                        ///call submit maybe?
                       },
                       validator: (v) {
                         String? doestMatchPasswords =
@@ -212,7 +254,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   final OutlineInputBorder _baseBorder = const OutlineInputBorder(
     borderSide: BorderSide(color: Colors.grey),
-    borderRadius: BorderRadius.all(Radius.circular(4)),
+    borderRadius: BorderRadius.all(Radius.circular(10)),
   );
 
   InputDecoration get decoration => InputDecoration(
@@ -223,10 +265,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       errorMaxLines: 3,
       disabledBorder: _baseBorder,
       enabledBorder: _baseBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.black87, width: 1),
+        borderSide: const BorderSide(color: ldarkblue, width: 1),
       ),
       focusedBorder: _baseBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.blueAccent, width: 1),
+        borderSide: const BorderSide(color: lmainblue, width: 1),
       ),
       errorBorder: _baseBorder.copyWith(
         borderSide: const BorderSide(color: Colors.deepOrangeAccent, width: 1),

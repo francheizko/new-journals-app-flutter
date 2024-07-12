@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:state_change_demo/constants/constants.dart';
 import 'package:state_change_demo/screens/home/googlemap_screen.dart';
 import 'package:state_change_demo/screens/home/home_screen.dart';
 import 'package:state_change_demo/screens/home/profile_screen.dart';
@@ -28,6 +29,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
     return Scaffold(
       body: widget.child ?? const Placeholder(),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: lwhite,
         currentIndex: index,
         onTap: (i) {
           setState(() {
