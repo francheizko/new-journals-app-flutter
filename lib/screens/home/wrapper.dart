@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:state_change_demo/constants/constants.dart';
 import 'package:state_change_demo/screens/home/googlemap_screen.dart';
 import 'package:state_change_demo/screens/home/home_screen.dart';
@@ -17,7 +18,6 @@ class HomeWrapper extends StatefulWidget {
 class _HomeWrapperState extends State<HomeWrapper> {
   int index = 0;
 
-  // Update routes to include ProfileScreen.route
   List<String> routes = [
     HomeScreen.route,
     MapScreen.route,
@@ -29,6 +29,10 @@ class _HomeWrapperState extends State<HomeWrapper> {
     return Scaffold(
       body: widget.child ?? const Placeholder(),
       bottomNavigationBar: BottomNavigationBar(
+        unselectedIconTheme: const IconThemeData(color: lsecfontcolor),
+        selectedIconTheme: const IconThemeData(color: ldarkblue),
+        selectedLabelStyle: GoogleFonts.poppins(color: ldarkblue),
+        unselectedLabelStyle: GoogleFonts.poppins(color: lsecfontcolor),
         backgroundColor: lwhite,
         currentIndex: index,
         onTap: (i) {
@@ -38,10 +42,16 @@ class _HomeWrapperState extends State<HomeWrapper> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.home,
+              ),
+              label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.supervised_user_circle), label: "Profile"),
+            icon: Icon(Icons.info),
+            label: "About",
+          ),
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const String apiKey = "AIzaSyALbCPWLL8qnq0w-jQihkxso9Oom8ZHEio";
+
 const lwhite = Color(0xFFFFFFFF);
 const ldarkblue = Color(0xFF4F727B);
 const lmainblue = Color(0xFF68E1FD);

@@ -1,9 +1,13 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:state_change_demo/constants/constants.dart';
 import 'package:state_change_demo/model/journal_entry.dart';
+import 'package:state_change_demo/screens/home/journal_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     print('Fetching entries for user ID: $userId');
 
-    // Fetch all entries for the user
     Query query = FirebaseFirestore.instance
         .collection('journal_entries')
         .where('userId', isEqualTo: userId)
@@ -38,21 +41,21 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Snapshot received with ${snapshot.docs.length} documents');
       List<JournalEntry> entries = snapshot.docs
           .map((doc) {
-            final data = doc.data()
-                as Map<String, dynamic>; // Ensure data is cast properly
+            final data = doc.data() as Map<String, dynamic>;
             print('Document data: $data');
             try {
-              return JournalEntry.fromMap(data); // Return JournalEntry instance
+              final entry = JournalEntry.fromMap(data);
+              entry.id = doc.id;
+              return entry;
             } catch (e) {
               print('Error parsing document data: $e');
-              return null; // Return null if there is an error
+              return null;
             }
           })
-          .where((entry) => entry != null) // Filter out null entries
-          .cast<JournalEntry>() // Cast to List<JournalEntry>
-          .toList(); // Convert to List<JournalEntry>
+          .where((entry) => entry != null)
+          .cast<JournalEntry>()
+          .toList();
 
-      // Filter entries based on the search query
       if (_searchQuery.isNotEmpty) {
         final searchLowerCase = _searchQuery.toLowerCase();
         entries = entries
@@ -63,6 +66,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return entries;
     });
+  }
+
+  void _showDeleteConfirmation(String? entryId) {
+    if (entryId == null || entryId.isEmpty) {
+      print('Invalid entry ID');
+      return;
+    }
+
+    showModalBottomSheet(
+      backgroundColor: lwhite,
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete Entry'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('journal_entries')
+                        .doc(entryId)
+                        .delete();
+                    print('Journal entry deleted successfully');
+                  } catch (e) {
+                    print('Error deleting journal entry: $e');
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _navigateToProfile() {
+    GoRouter.of(context).go('/profile');
   }
 
   @override
@@ -84,10 +128,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SizedBox(
             width: 100,
             height: 100,
-            child: Image.asset(
-              'assets/images/Tap & Tell-4.png',
-              fit: BoxFit
-                  .contain, // Ensures the image fits within the AspectRatio
+            child: GestureDetector(
+              onTap: _navigateToProfile,
+              child: Image.asset(
+                'assets/images/Tap & Tell-4.png',
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         ),
@@ -111,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -118,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Color.fromARGB(179, 237, 236, 236),
+                color: const Color.fromARGB(179, 237, 236, 236),
               ),
               child: Row(
                 children: [
@@ -155,7 +202,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            Text(
+              'My Journals',
+              style: GoogleFonts.poppins(
+                color: ldarkblue,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
             Expanded(
               child: StreamBuilder<List<JournalEntry>>(
                 stream: _fetchJournalEntries(),
@@ -177,78 +233,105 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final entry = snapshot.data![index];
+                      if (entry.id == null || entry.id!.isEmpty) {
+                        print(
+                            'Entry ID is null or empty for entry: ${entry.toMap()}');
+                        return const SizedBox.shrink();
+                      }
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: lwhite,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset:
-                                    Offset(0, 2), // changes position of shadow
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailScreen(entry: entry),
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(16)),
-                                child: entry.imageUrl.isNotEmpty
-                                    ? Image.network(
-                                        entry.imageUrl,
-                                        width: double.infinity,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Container(
-                                        color: Colors.grey[200],
-                                        width: double.infinity,
-                                        height: 120,
-                                        child: Center(
-                                          child: Text(
-                                            'No Image',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.grey,
-                                              fontSize: 16,
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: lwhite,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(16)),
+                                  child: entry.imageUrl.isNotEmpty
+                                      ? Image.network(
+                                          entry.imageUrl,
+                                          width: double.infinity,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Container(
+                                          color: Colors.grey[200],
+                                          width: double.infinity,
+                                          height: 120,
+                                          child: Center(
+                                            child: Text(
+                                              'No Image',
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.grey,
+                                                fontSize: 16,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      entry.title,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: ldarkblue,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      entry.timestamp.toDate().toString(),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        color: lsecfontcolor,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            entry.title,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: ldarkblue,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            entry.timestamp.toDate().toString(),
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                              color: lsecfontcolor,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                        ],
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.more_vert),
+                                        onPressed: () {
+                                          _showDeleteConfirmation(entry.id);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
